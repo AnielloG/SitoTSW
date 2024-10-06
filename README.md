@@ -54,6 +54,7 @@ Il database è strutturato per supportare tutte le funzionalità chiave del sito
 
 - Aniello Giamundo - [Matricola: 0512118649]
 - Diana Gagliardi - [Matricola: 0512117086]
+- Gabriella Fede - [Matricola: 0512117296]
 
 ## Docente
 

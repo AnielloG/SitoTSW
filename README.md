@@ -35,6 +35,7 @@ Il sito è completamente **responsive**, adattandosi a diverse dimensioni di sch
 - **Frontend**: HTML5, CSS3, JavaScript
 - **Backend**: Java (Servlets, JSP)
 - **Database**: MySQL
+- **IDE**: Eclipse 
 - **Altro**: Architettura MVC, Design responsive
 
 ## Struttura del Progetto

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd" id="WebApp_ID" version="4.0">
+  <display-name>TSW11</display-name>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>Home.jsp</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <!-- Configurazione per la gestione delle pagine di errore -->
+  <error-page>
+    <error-code>404</error-code>
+    <location>/Errore404.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>500</error-code>
+    <location>/Errore500.jsp</location>
+  </error-page>
+  
+  
+  <!--Configurazione delle Servlet presenti nel Control-->
+  <servlet>
+    <servlet-name>AcquistoControl</servlet-name>
+    <servlet-class>Control.AcquistoControl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AcquistoControl</servlet-name>
+    <url-pattern>/acquista</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>ProductControl</servlet-name>
+    <servlet-class>Control.ProductControl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ProductControl</servlet-name>
+    <url-pattern>/product</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>OrdineControl</servlet-name>
+    <servlet-class>Control.OrdineControl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>OrdineControl</servlet-name>
+    <url-pattern>/ordine</url-pattern>
+  </servlet-mapping>
+  
+     <servlet>
+    <servlet-name>RegistrationControl</servlet-name>
+    <servlet-class>Control.RegistrationControl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RegistrationControl</servlet-name>
+    <url-pattern>/registration</url-pattern>
+  </servlet-mapping>
+  
+       <servlet>
+    <servlet-name>FatturaControl</servlet-name>
+    <servlet-class>Control.FatturaControl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FatturaControl</servlet-name>
+    <url-pattern>/fattura</url-pattern>
+  </servlet-mapping>
+  
+</web-app>

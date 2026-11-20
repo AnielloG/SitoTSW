@@ -1,0 +1,19 @@
+# Build Maven
+target/
+build/
+
+# IntelliJ
+.idea/
+*.iml
+out/
+
+# Eclipse (progetto originale)
+.classpath
+.project
+.settings/
+.metadata/
+
+# Segreti e configurazioni locali
+.env
+*.local
+*.log

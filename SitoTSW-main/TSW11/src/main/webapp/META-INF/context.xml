@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Le credenziali NON sono nel repository: Tomcat sostituisce i segnaposto ${...}
+  con le proprietà di sistema passate all'avvio (JVM option -Dnome=valore).
+
+  Obbligatorie:  -Ddb.user=...   -Ddb.password=...
+  Opzionale:     -Ddb.host=...   (default: localhost)
+-->
+<Context>
+    <Resource name="jdbc/sito"
+              auth="Container"
+              driverClassName="com.mysql.cj.jdbc.Driver"
+              type="javax.sql.DataSource"
+              username="${db.user}"
+              password="${db.password}"
+              url="jdbc:mysql://${db.host:-localhost}:3306/sito?useUnicode=true&amp;serverTimezone=UTC"/>
+</Context>

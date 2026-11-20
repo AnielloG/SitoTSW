@@ -3,7 +3,7 @@
 
 <%
 	
-    ProductDao productDao = new ProductDao();
+    ProductDAO productDao = new ProductDAO();
     Collection<Prodotto> products = productDao.doRetrieveAll();
     request.setAttribute("products", products);
     
@@ -11,7 +11,7 @@
     List<Ordine> ordini = ordineDao.getAllOrdini();
     request.setAttribute("ordini", ordini);
     
-    UtenteDao utenteDao = new UtenteDao();
+    UtenteDAO utenteDao = new UtenteDAO();
     List<Utente> utenti = utenteDao.doRetrieveAll();
     request.setAttribute("utenti", utenti);
     if((int) session.getAttribute("tipo_account")== 1){

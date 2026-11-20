@@ -20,48 +20,5 @@
   </error-page>
   
   
-  <!--Configurazione delle Servlet presenti nel Control-->
-  <servlet>
-    <servlet-name>AcquistoControl</servlet-name>
-    <servlet-class>Control.AcquistoControl</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>AcquistoControl</servlet-name>
-    <url-pattern>/acquista</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <servlet-name>ProductControl</servlet-name>
-    <servlet-class>Control.ProductControl</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>ProductControl</servlet-name>
-    <url-pattern>/product</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <servlet-name>OrdineControl</servlet-name>
-    <servlet-class>Control.OrdineControl</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>OrdineControl</servlet-name>
-    <url-pattern>/ordine</url-pattern>
-  </servlet-mapping>
-  
-     <servlet>
-    <servlet-name>RegistrationControl</servlet-name>
-    <servlet-class>Control.RegistrationControl</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>RegistrationControl</servlet-name>
-    <url-pattern>/registration</url-pattern>
-  </servlet-mapping>
-  
-       <servlet>
-    <servlet-name>FatturaControl</servlet-name>
-    <servlet-class>Control.FatturaControl</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>FatturaControl</servlet-name>
-    <url-pattern>/fattura</url-pattern>
-  </servlet-mapping>
-  
+  <!-- Le servlet sono registrate con @WebServlet nelle classi del package Control -->
 </web-app>

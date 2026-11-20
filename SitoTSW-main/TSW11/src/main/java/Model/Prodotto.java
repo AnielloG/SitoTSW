@@ -14,7 +14,7 @@ public class Prodotto {
 	private Double iva;
 	
 	byte [] img;
-	ArrayList<immagine> allimg;
+	ArrayList<Immagine> allimg;
 	
 	
 	public Prodotto() {
@@ -75,10 +75,10 @@ public class Prodotto {
 	public void setImg(byte[] img) {
 		this.img = img;
 	}
-	public ArrayList<immagine> getAllimg() {
+	public ArrayList<Immagine> getAllimg() {
 		return allimg;
 	}
-	public void setAllimg(ArrayList<immagine> allimg) {
+	public void setAllimg(ArrayList<Immagine> allimg) {
 		this.allimg = allimg;
 	}
 	public String getSesso() {

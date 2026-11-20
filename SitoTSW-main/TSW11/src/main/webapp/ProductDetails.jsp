@@ -9,7 +9,7 @@
 
 <!DOCTYPE html>
 <html lang="it">
-<%@ page contentType="text/html; charset=UTF-8" import="java.util.*,Model.Prodotto,Model.Cart,Model.immagine"%>
+<%@ page contentType="text/html; charset=UTF-8" import="java.util.*,Model.Prodotto,Model.Cart,Model.Immagine"%>
 <head>
     <meta charset="UTF-8">
     <title>Dettagli prodotto</title>
@@ -339,9 +339,9 @@ border-radius: 5px;
             <br>
             <div class="small-imgs">
                 <% if (product.getAllimg() != null) {
-                    ArrayList<immagine> a = product.getAllimg();
+                    ArrayList<Immagine> a = product.getAllimg();
                     for (int i = 0; i < a.size(); i++) {
-                        immagine im = a.get(i);
+                        Immagine im = a.get(i);
                         byte[] foto = im.getImg();
                         String base64foto = "";
                         if (foto != null) {

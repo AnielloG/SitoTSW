@@ -3,6 +3,8 @@ package Control;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -21,8 +23,9 @@ import Model.Prodotto;
 /**
  * Servlet implementation class OrdineControl
  */
-@WebServlet("/OrdineControl")
+@WebServlet({ "/OrdineControl", "/ordine" })
 public class OrdineControl extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(OrdineControl.class.getName());
 	private static final long serialVersionUID = 1L;
     OrdineDAO ordine = new OrdineDAO();
     /**
@@ -82,7 +85,7 @@ public class OrdineControl extends HttpServlet {
 		            response.getWriter().write(json);
 
 			    } catch (SQLException e) {
-			        e.printStackTrace();
+			        LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			        request.setAttribute("errore", "Errore del database: " + e.getMessage());
 			    }
 			}

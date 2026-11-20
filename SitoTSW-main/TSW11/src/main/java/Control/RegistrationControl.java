@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,15 +20,17 @@ import com.google.gson.Gson;
 import Model.Ordine;
 import Model.OrdineDAO;
 import Model.Utente;
-import Model.UtenteDao;
+import Model.UtenteDAO;
 
 /**
 
 Servlet implementation class RegistrationControl
 */
+@WebServlet("/registration")
 public class RegistrationControl extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(RegistrationControl.class.getName());
 private static final long serialVersionUID = 1L;
-UtenteDao Model = new UtenteDao();
+UtenteDAO utenteDAO = new UtenteDAO();
 /**
 
 @see HttpServlet#HttpServlet()
@@ -75,7 +80,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 			bean.setNome(nome);
 			bean.setIndirizzo(indirizzo);
 			bean.setProvincia(provincia);
-			Model.doSave(bean);
+			utenteDAO.doSave(bean);
 			RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/Home.jsp");
 			dispatcher.forward(request, response);
 		}
@@ -96,7 +101,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             session.setAttribute("nome", bean.getNome());
             session.setAttribute("password", bean.getPass());
 		
-			Model.doSaveRistretto(bean);
+			utenteDAO.doSaveRistretto(bean);
 			RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/Home.jsp");
 			dispatcher.forward(request, response);
 		}
@@ -105,7 +110,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             String pwd = request.getParameter("pass");
             
             try {
-                UtenteDao dao = new UtenteDao();
+                UtenteDAO dao = new UtenteDAO();
                 Utente utente = dao.doRetrieveByEmail(email);
                 
                 if (utente != null && utente.getPass().equals(pwd)) {
@@ -132,7 +137,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
                     
                 }
                 }catch (SQLException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
                 request.setAttribute("errore", "Errore del database: " + e.getMessage());
                 request.getRequestDispatcher("/Accedi.jsp").forward(request, response);
             }
@@ -142,7 +147,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 		    try {
 		    	String email = request.getParameter("email");
 	            // Esegui la logica per ottenere gli utenti corrispondenti all'email dal tuo database
-		        UtenteDao dao = new UtenteDao();
+		        UtenteDAO dao = new UtenteDAO();
 		        List<Utente> utenti = dao.searchByEmail(email);
 
 	            // Converte gli utenti in formato JSON e invia la risposta
@@ -153,7 +158,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 	            response.getWriter().write(json);
 
 		    } catch (SQLException e) {
-		        e.printStackTrace();
+		        LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		        request.setAttribute("errore", "Errore del database: " + e.getMessage());
 		    }
 		}
@@ -178,7 +183,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             utente.setPass(pass);
             
             OrdineDAO ordine = new OrdineDAO();
-            UtenteDao utenteDao = new UtenteDao();
+            UtenteDAO utenteDao = new UtenteDAO();
             utenteDao.doUpdate(utente);
             ArrayList<Ordine> ordini= (ArrayList<Ordine>) ordine.searchByEmail(email);
             HttpSession session = request.getSession();
@@ -195,7 +200,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
         }
 	}}
 	catch (SQLException e) {
-	System.out.println("Error:" + e.getMessage());
+	LOGGER.log(Level.SEVERE, e.getMessage(), e);
 	request.setAttribute("errore2", "Mail gia usata" );
 	RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/Accedi.jsp");
 	dispatcher.forward(request, response);

@@ -3,8 +3,11 @@ package Control;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,20 +16,22 @@ import javax.servlet.http.HttpSession;
 import Model.Ordine;
 import Model.OrdineDAO;
 import Model.Prodotto;
-import Model.ProductDao;
+import Model.ProductDAO;
 import Model.Utente;
-import Model.UtenteDao;
+import Model.UtenteDAO;
 
+@WebServlet("/fattura")
 public class FatturaControl extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(FatturaControl.class.getName());
     private static final long serialVersionUID = 1L;
     private OrdineDAO ordineDAO;
-    private UtenteDao utenteDAO;
-    private ProductDao prodottoDAO;
+    private UtenteDAO utenteDAO;
+    private ProductDAO prodottoDAO;
 
     public void init() throws ServletException {
         ordineDAO = new OrdineDAO();
-        utenteDAO = new UtenteDao();
-        prodottoDAO = new ProductDao();
+        utenteDAO = new UtenteDAO();
+        prodottoDAO = new ProductDAO();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -39,9 +44,6 @@ public class FatturaControl extends HttpServlet {
                 Utente utente = utenteDAO.doRetrieveByEmail(email);
                 Collection<Prodotto> listaProdotti = prodottoDAO.doRetrieveByOrdine(numeroOrdine);
                 
-                System.out.println("Indirizzo: " + ordine.getIndirizzo());
-                System.out.println("Data Ordine: " + ordine.getData());
-                System.out.println("Numero Ordine: " + ordine.getNumeroOrdine());
 
                 if (ordine != null && utente != null && listaProdotti != null) {
                     HttpSession session = request.getSession();
@@ -53,8 +55,7 @@ public class FatturaControl extends HttpServlet {
                     response.sendRedirect("Ricevuta.jsp");
                 }
             } catch (SQLException e) {
-                System.out.println("Error: " + e.getMessage());
-                System.out.println("SONO QUI");
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
         }
     }

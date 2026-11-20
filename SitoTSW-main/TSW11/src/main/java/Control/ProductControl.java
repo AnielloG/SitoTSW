@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -22,18 +24,19 @@ import com.google.gson.Gson;
 
 import Model.Cart;
 import Model.Prodotto;
-import Model.ProductDao;
+import Model.ProductDAO;
 
 
 /**
  * Servlet implementation class ProductControl
  */
-@WebServlet("/ProductControl")
+@WebServlet(urlPatterns = { "/ProductControl", "/product" })
 @MultipartConfig  // Necessario per la gestione dell'upload di file
 public class ProductControl extends HttpServlet {
+    private static final Logger LOGGER = Logger.getLogger(ProductControl.class.getName());
 	private static final long serialVersionUID = 1L;	
 	
-	ProductDao	Model = new ProductDao();
+	ProductDAO productDAO = new ProductDAO();
 	
 	public ProductControl() {
 		super();
@@ -58,7 +61,7 @@ public class ProductControl extends HttpServlet {
 	            switch (action.toLowerCase()) {
 	                case "addc":
 	                    int productId = Integer.parseInt(request.getParameter("id"));  // Cambia 'id' in 'productId'
-	                    cart.addProduct(Model.doRetrieveByKey(productId));
+	                    cart.addProduct(productDAO.doRetrieveByKey(productId));
 	                    request.setAttribute("cart", cart);
 	                    
 	                    String referer = request.getHeader("Referer");
@@ -74,7 +77,7 @@ public class ProductControl extends HttpServlet {
 
 	                case "deletec":
 	                    productId = Integer.parseInt(request.getParameter("id"));  // Riutilizza 'productId'
-	                    cart.deleteProduct(Model.doRetrieveByKey(productId));
+	                    cart.deleteProduct(productDAO.doRetrieveByKey(productId));
 	                    request.setAttribute("cart", cart);
 	                    dispatcher = getServletContext().getRequestDispatcher("/carrello.jsp");
 	                    dispatcher.forward(request, response);
@@ -83,15 +86,15 @@ public class ProductControl extends HttpServlet {
 	                case "read":
 	                    productId = Integer.parseInt(request.getParameter("id"));  // Riutilizza 'productId'
 	                    request.removeAttribute("product");
-	                    request.setAttribute("product", Model.doRetrieveByKey(productId));
-	                    request.setAttribute("media", Model.media(productId));
+	                    request.setAttribute("product", productDAO.doRetrieveByKey(productId));
+	                    request.setAttribute("media", productDAO.media(productId));
 	                    dispatcher = getServletContext().getRequestDispatcher("/ProductDetails.jsp");
 	                    dispatcher.forward(request, response);
 	                    break;
 
 	                case "delete":
 	                    productId = Integer.valueOf(request.getParameter("id"));  // Riutilizza 'productId'
-	                    Model.doDelete(productId);
+	                    productDAO.doDelete(productId);
 	                    dispatcher = getServletContext().getRequestDispatcher("/Amministratore.jsp");
 	                    dispatcher.forward(request, response);
 	                    break;
@@ -99,7 +102,7 @@ public class ProductControl extends HttpServlet {
 	                case "suggest":
 	                    String query = request.getParameter("query");
 	                    try {
-	                        List<String> suggestions = Model.getSuggestions(query);
+	                        List<String> suggestions = productDAO.getSuggestions(query);
 	                        response.setContentType("application/json");
 	                        response.setCharacterEncoding("UTF-8");
 	                        String json = new Gson().toJson(suggestions);
@@ -107,33 +110,33 @@ public class ProductControl extends HttpServlet {
 	                    } catch (SQLException e) {
 	                        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	                        response.getWriter().write("Errore durante il recupero dei suggerimenti");
-	                        e.printStackTrace();
+	                        LOGGER.log(Level.SEVERE, e.getMessage(), e);
 	                    }
 	                    return; // Aggiungi questo per evitare ulteriori elaborazioni
 
 	                case "search":
 	                	HttpSession session = request.getSession(false); // Verifica la sessione attuale
 	                    if (session != null) {
-	                        System.out.println("Utente loggato, sessione attiva: " + session.getAttribute("user"));
+	                        LOGGER.fine("Utente loggato, sessione attiva: " + session.getAttribute("user"));
 	                    } else {
-	                        System.out.println("Nessuna sessione attiva");
+	                        LOGGER.fine("Nessuna sessione attiva");
 	                    }
-	                    System.out.println("Search action received. Query: " + request.getParameter("nome"));
+	                    LOGGER.fine("Search action received. Query: " + request.getParameter("nome"));
 	                    String nome = request.getParameter("nome");
 	                    try {
-	                        Collection<Prodotto> searchResults = Model.searchProducts(nome);
+	                        Collection<Prodotto> searchResults = productDAO.searchProducts(nome);
 	                        request.setAttribute("products", searchResults);
 	                        RequestDispatcher dispatcher1 = getServletContext().getRequestDispatcher("/ProductView.jsp");
 	                        dispatcher1.forward(request, response);
 	                    } catch (SQLException e) {
-	                        System.out.println("Error:" + e.getMessage());
+	                        LOGGER.log(Level.SEVERE, e.getMessage(), e);
 	                        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Errore durante la ricerca dei prodotti");
 	                    }
 	                    return;
 
 	                case "updateq":
 	                    productId = Integer.valueOf(request.getParameter("id"));  // Riutilizza 'productId'
-	                    Model.doupdateq(productId);
+	                    productDAO.doupdateq(productId);
 	                    dispatcher = getServletContext().getRequestDispatcher("/Amministratore.jsp");
 	                    dispatcher.forward(request, response);
 	                    break;
@@ -141,7 +144,7 @@ public class ProductControl extends HttpServlet {
 	                case "change":
 	                    int idfoto = Integer.parseInt(request.getParameter("id"));
 	                    int idprod = Integer.parseInt(request.getParameter("productid"));
-	                    request.setAttribute("product", Model.Cambiafoto(idfoto, idprod));
+	                    request.setAttribute("product", productDAO.Cambiafoto(idfoto, idprod));
 	                    dispatcher = getServletContext().getRequestDispatcher("/ProductDetails.jsp");
 	                    dispatcher.forward(request, response);
 	                    break;
@@ -152,14 +155,14 @@ public class ProductControl extends HttpServlet {
 	                    try {
 	                        request.removeAttribute("products");
 	                        if (sesso != null && categoria != null) {
-	                            request.setAttribute("products", Model.doRetrieveBySessoAndCategoria(sesso, categoria));
+	                            request.setAttribute("products", productDAO.doRetrieveBySessoAndCategoria(sesso, categoria));
 	                        } else if (sesso != null) {
-	                            request.setAttribute("products", Model.doRetrieveBySesso(sesso));
+	                            request.setAttribute("products", productDAO.doRetrieveBySesso(sesso));
 	                        } else if (categoria != null) {
-	                            request.setAttribute("products", Model.doRetrieveByCategoria(categoria));
+	                            request.setAttribute("products", productDAO.doRetrieveByCategoria(categoria));
 	                        }
 	                    } catch (SQLException e) {
-	                        System.out.println("Error:" + e.getMessage());
+	                        LOGGER.log(Level.SEVERE, e.getMessage(), e);
 	                    }
 
 	                    dispatcher = getServletContext().getRequestDispatcher("/ProductView.jsp");
@@ -175,7 +178,7 @@ public class ProductControl extends HttpServlet {
 	                case "edit":
 	                    id = request.getParameter("id");
 	                    String prezzo = request.getParameter("prezzo");
-	                    Model.cambiaprezzo(id, prezzo);
+	                    productDAO.cambiaprezzo(id, prezzo);
 	                    dispatcher = getServletContext().getRequestDispatcher("/Amministratore.jsp");
 	                    dispatcher.forward(request, response);
 	                    break;
@@ -192,7 +195,7 @@ public class ProductControl extends HttpServlet {
 	                    try {
 	                        bytes = IOUtils.toByteArray(inputStream);
 	                    } catch (IOException e) {
-	                        e.printStackTrace();
+	                        LOGGER.log(Level.SEVERE, e.getMessage(), e);
 	                    } finally {
 	                        if (inputStream != null) {
 	                            inputStream.close();
@@ -209,10 +212,10 @@ public class ProductControl extends HttpServlet {
 	                    prodotto.setCategoria(categoria);
 
 	                    try {
-	                        Model.doSave(prodotto);
+	                        productDAO.doSave(prodotto);
 	                        response.sendRedirect(request.getContextPath() + "/Amministratore.jsp");
 	                    } catch (SQLException e) {
-	                        e.printStackTrace();
+	                        LOGGER.log(Level.SEVERE, e.getMessage(), e);
 	                        request.setAttribute("errore", "Errore del database: " + e.getMessage());
 	                        dispatcher = getServletContext().getRequestDispatcher("/Errore.jsp");
 	                        dispatcher.forward(request, response);
@@ -222,22 +225,21 @@ public class ProductControl extends HttpServlet {
 	                case "all":
 	                    try {
 	                        request.removeAttribute("products");
-	                        request.setAttribute("products", Model.doRetrieveAll());
+	                        request.setAttribute("products", productDAO.doRetrieveAll());
 	                    } catch (SQLException e) {
-	                        System.out.println("Error:" + e.getMessage());
+	                        LOGGER.log(Level.SEVERE, e.getMessage(), e);
 	                    }
 	                    dispatcher = getServletContext().getRequestDispatcher("/ProductView.jsp");
 	                    dispatcher.forward(request, response);
 	                    break;
 
 	                default:
-	                    System.out.println("Azione non riconosciuta: " + action);
+	                    LOGGER.fine("Azione non riconosciuta: " + action);
 	                    break;
 	            }
 	        }
 	    } catch (SQLException e) {
-	        System.out.println("Error:" + e.getMessage());
-	        e.printStackTrace();
+	        LOGGER.log(Level.SEVERE, e.getMessage(), e);
 	    }
 
 	    request.getSession().setAttribute("cart", cart);
@@ -283,7 +285,7 @@ public class ProductControl extends HttpServlet {
 	            prodotto.setImg(fotoBytes);
 
 	            // Salva il prodotto nel database usando il DAO
-	            ProductDao productDao = new ProductDao();
+	            ProductDAO productDao = new ProductDAO();
 	            productDao.doSave(prodotto);
 
 	            // Rispondi al client con un messaggio di successo
@@ -291,7 +293,7 @@ public class ProductControl extends HttpServlet {
 	            response.getWriter().write("Prodotto salvato con successo");
 
 	        } catch (SQLException e) {
-	            e.printStackTrace();
+	            LOGGER.log(Level.SEVERE, e.getMessage(), e);
 	            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	            response.getWriter().write("Errore durante il salvataggio del prodotto");
 	        } catch (NumberFormatException e) {

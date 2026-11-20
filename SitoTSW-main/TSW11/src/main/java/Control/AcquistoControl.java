@@ -1,6 +1,8 @@
 package Control;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -9,21 +11,22 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import Model.AcquistoDao;
+import Model.AcquistoDAO;
 import Model.Cart;
 
 
 /**
  * Servlet implementation class AcquistoControl
  */
-@WebServlet("/AcquistoControl")
+@WebServlet({ "/AcquistoControl", "/acquista" })
 public class AcquistoControl extends HttpServlet {
+	private static final Logger LOGGER = Logger.getLogger(AcquistoControl.class.getName());
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-	AcquistoDao	model = new AcquistoDao();
+	AcquistoDAO acquistoDAO = new AcquistoDAO();
     public AcquistoControl() {
         super();
         
@@ -47,10 +50,11 @@ public class AcquistoControl extends HttpServlet {
 	    if (action != null) {
 	        
 	        if (action.equalsIgnoreCase("visualizza")) {
-	            if(cart.getProducts().size() == 0) {
+	            if(cart.getProducts().isEmpty()) {
 	                request.setAttribute("errore", "Il carrello è vuoto. Si prega di inserire almeno un prodotto prima di procedere all'acquisto.\n");
 	                RequestDispatcher dispatcher = request.getRequestDispatcher("/product?action=viewC");
 	                dispatcher.forward(request, response);
+	                return;
 	            }
 	            
 	            if(request.getSession().getAttribute("email") != null) {
@@ -101,11 +105,11 @@ public class AcquistoControl extends HttpServlet {
 
 	            // Inserimento dell'ordine nel database (chiamata al modello)
 	            try {
-	                model.inserimentoaq(provincia, indirizzo, cap, citta, cart, email, pagamento, numeroCarta, titolareCarta, scadenzaCarta, cvv);
+	                acquistoDAO.inserimentoaq(provincia, indirizzo, cap, citta, cart, email, pagamento, numeroCarta, titolareCarta, scadenzaCarta, cvv);
 	                
 	                // Controllo se il carrello è stato svuotato correttamente come validazione
 	                cart.deleteAllProduct();
-	                if (cart.getProducts().size() == 0) {
+	                if (cart.getProducts().isEmpty()) {
 	                    request.setAttribute("successMessage", "Acquisto andato a buon fine.");
 	                } else {
 	                    request.setAttribute("errorMessage", "Acquisto non andato a buon fine.");
@@ -113,6 +117,7 @@ public class AcquistoControl extends HttpServlet {
 
 	                request.setAttribute("cart", cart);
 	            } catch (Exception e) {
+	                LOGGER.log(Level.SEVERE, "Errore durante l'inserimento dell'ordine", e);
 	                // Gestione di eventuali errori che potrebbero accadere durante l'inserimento
 	                request.setAttribute("errorMessage", "Errore durante l'elaborazione dell'acquisto: " + e.getMessage());
 	            }
